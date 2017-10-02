@@ -1,9 +1,12 @@
-Sotto la guida originale.
-Per far partire seguire i passi di "Development version"
-infine far partire con il parametro regtest:
+For regtest mode follow the "Development version" steps and launch with regtest parameter:
+
+
 ./electrum --regtest
 
 
+
+
+Down below the original guide
 
 
 
