@@ -1,3 +1,13 @@
+Sotto la guida originale.
+Per far partire seguire i passi di "Development version"
+infine far partire con il parametro regtest:
+./electrum --regtest
+
+
+
+
+
+
 Electrum - Lightweight Bitcoin client
 =====================================
 
