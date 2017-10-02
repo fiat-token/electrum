@@ -65,6 +65,7 @@ XPUB_HEADERS = {
 
 # Bitcoin network constants
 TESTNET = False
+REGTEST = False
 NOLNET = False
 ADDRTYPE_P2PKH = 0
 ADDRTYPE_P2SH = 5
@@ -90,6 +91,22 @@ def set_testnet():
     SERVERLIST = 'servers_testnet.json'
     DEFAULT_PORTS = {'t':'51001', 's':'51002'}
     DEFAULT_SERVERS = read_json_dict('servers_testnet.json')
+
+def set_regtest():
+    global ADDRTYPE_P2PKH, ADDRTYPE_P2SH
+    global REGTEST, HEADERS_URL
+    global GENESIS
+    global SEGWIT_HRP
+    global DEFAULT_PORTS, SERVERLIST, DEFAULT_SERVERS
+    REGTEST = True
+    ADDRTYPE_P2PKH = 111
+    ADDRTYPE_P2SH = 196
+    SEGWIT_HRP = "tb"
+    HEADERS_URL = "" # "https://headers.electrum.org/testnet_headers"
+    GENESIS = "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"
+    SERVERLIST = 'servers_regtest.json'
+    DEFAULT_PORTS = {'t':'8002', 's':'8002'}
+    DEFAULT_SERVERS = read_json_dict('servers_regtest.json')
 
 
 ################################## transactions

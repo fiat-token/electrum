@@ -470,9 +470,18 @@ testnet_block_explorers = {
                        {'tx': 'tx', 'addr': 'address'}),
 }
 
+regtest = {
+    'system default': ('blockchain:',
+                       {'tx': 'tx', 'addr': 'address'})
+}
+
 def block_explorer_info():
     from . import bitcoin
-    return testnet_block_explorers if bitcoin.TESTNET else mainnet_block_explorers
+    if bitcoin.TESTNET == True:
+        return testnet_block_explorers
+    if bitcoin.REGTEST == True:
+        return regtest_block_explorers 
+    return mainnet_block_explorers
 
 def block_explorer(config):
     return config.get('block_explorer', 'Blocktrail.com')

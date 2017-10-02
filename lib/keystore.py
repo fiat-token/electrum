@@ -699,7 +699,11 @@ is_bip32_key = lambda x: is_xprv(x) or is_xpub(x)
 
 def bip44_derivation(account_id, segwit=False):
     bip  = 49 if segwit else 44
-    coin = 1 if bitcoin.TESTNET else 0
+    coin = 0;
+    if bitcoin.TESTNET:
+        coin = 1
+    if bitcoin.REGTEST:
+        coin = 1
     return "m/%d'/%d'/%d'" % (bip, coin, int(account_id))
 
 def from_seed(seed, passphrase):
