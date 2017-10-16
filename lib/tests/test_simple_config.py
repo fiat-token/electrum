@@ -86,12 +86,12 @@ class Test_SimpleConfig(unittest.TestCase):
         self.assertEqual("b", config.get("electrum_path"))
 
     def test_simple_config_system_config_ignored_if_portable(self):
-        """If electrum is started with the "portable" flag, system
+        """If electrum is started with the "install" flag, system
         configuration is completely ignored."""
         fake_read_system = lambda : {"some_key": "some_value"}
         fake_read_user = lambda _: {}
         read_user_dir = lambda : self.user_dir
-        config = SimpleConfig(options={"portable": True},
+        config = SimpleConfig(options={"install": False},
                               read_system_config_function=fake_read_system,
                               read_user_config_function=fake_read_user,
                               read_user_dir_function=read_user_dir)
@@ -152,7 +152,7 @@ class Test_SimpleConfig(unittest.TestCase):
         fake_read_system = lambda : {"electrum_path": self.electrum_dir}
         fake_read_user = lambda _: {}
         read_user_dir = lambda : self.user_dir
-        config = SimpleConfig(options={"portable": True},
+        config = SimpleConfig(options={"install": False},
                               read_system_config_function=fake_read_system,
                               read_user_config_function=fake_read_user,
                               read_user_dir_function=read_user_dir)

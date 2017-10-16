@@ -105,7 +105,7 @@ def set_regtest():
     HEADERS_URL = "" # "https://headers.electrum.org/testnet_headers"
     GENESIS = "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"
     SERVERLIST = 'servers_regtest.json'
-    DEFAULT_PORTS = {'t':'8002', 's':'8002'}
+    DEFAULT_PORTS = {'t':'8003', 's':'8003'}
     DEFAULT_SERVERS = read_json_dict('servers_regtest.json')
 
 

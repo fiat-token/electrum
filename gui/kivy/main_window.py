@@ -132,7 +132,7 @@ class ElectrumWindow(App):
         self.send_screen.set_URI(uri)
 
     def on_new_intent(self, intent):
-        if intent.getScheme() != 'bitcoin':
+        if intent.getScheme() != 'vtkn':
             return
         uri = intent.getDataString()
         self.set_URI(uri)
@@ -154,7 +154,7 @@ class ElectrumWindow(App):
         self._trigger_update_history()
 
     def _get_bu(self):
-        return self.electrum_config.get('base_unit', 'mBTC')
+        return self.electrum_config.get('base_unit', 'vtkn')
 
     def _set_bu(self, value):
         assert value in base_units.keys()
@@ -265,7 +265,7 @@ class ElectrumWindow(App):
 
         # create triggers so as to minimize updation a max of 2 times a sec
         self._trigger_update_wallet = Clock.create_trigger(self.update_wallet, .5)
-        self._trigger_update_status = Clock.create_trigger(self.update_status, .5)
+        self._trigger_update_status = Clock.create_trigger(self.update_status, .5) 
         self._trigger_update_history = Clock.create_trigger(self.update_history, .5)
         self._trigger_update_interfaces = Clock.create_trigger(self.update_interfaces, .5)
         # cached dialogs
@@ -300,7 +300,7 @@ class ElectrumWindow(App):
         if is_address(data):
             self.set_URI(data)
             return
-        if data.startswith('bitcoin:'):
+        if data.startswith('vtkn:'):
             self.set_URI(data)
             return
         # try to decode transaction

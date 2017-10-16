@@ -151,11 +151,12 @@ class TrezorCompatiblePlugin(HW_PluginBase):
         return client
 
     def get_coin_name(self):
-        if TESTNET
+        if TESTNET:
             return "Testnet"
-        elif REGTEST
+        elif REGTEST:
             return "Regtest"
-        else return "Bitcoin"
+        else:
+            return "Bitcoin"
 
     def initialize_device(self, device_id, wizard, handler):
         # Initialization method

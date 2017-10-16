@@ -7,6 +7,7 @@ import ast
 import json
 import threading
 import os
+import pathlib
 
 from copy import deepcopy
 from .util import user_dir, print_error, print_msg, print_stderr, PrintError
@@ -64,7 +65,7 @@ class SimpleConfig(PrintError):
         self.cmdline_options = deepcopy(options)
 
         # Portable wallets don't use a system config
-        if self.cmdline_options.get('portable', False):
+        if not self.cmdline_options.get('install', False):
             self.system_config = {}
         else:
             self.system_config = read_system_config_function()
@@ -95,7 +96,7 @@ class SimpleConfig(PrintError):
         if not os.path.exists(path):
             if os.path.islink(path):
                 raise BaseException('Dangling link: ' + path)
-            os.mkdir(path)
+            pathlib.Path(path).mkdir(parents=True, exist_ok=True)
 
         self.print_error("electrum directory", path)
         return path
