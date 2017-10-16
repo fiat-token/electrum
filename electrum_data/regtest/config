@@ -1,0 +1,9 @@
+{
+    "auto_connect": true,
+    "console-history": [],
+    "gui_last_wallet": "/home/ubuntu/Desktop/repos/electrum/electrum_data/regtest/wallets/default_wallet",
+    "is_maximized": false,
+    "recently_open": [
+        "/home/ubuntu/Desktop/repos/electrum/electrum_data/regtest/wallets/default_wallet"
+    ]
+}

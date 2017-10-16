@@ -62,7 +62,7 @@ class HistoryList(MyTreeWidget):
         self.setColumnHidden(1, True)
 
     def refresh_headers(self):
-        headers = ['', '', _('Date'), _('Description') , _('Amount'), _('Balance')]
+        headers = ['', '', _('Date'), _('Note') , _('Amount'), _('Balance')]
         fx = self.parent.fx
         if fx and fx.show_history():
             headers.extend(['%s '%fx.ccy + _('Amount'), '%s '%fx.ccy + _('Balance')])
@@ -88,7 +88,16 @@ class HistoryList(MyTreeWidget):
             icon = QIcon(":icons/" + TX_ICONS[status])
             v_str = self.parent.format_amount(value, True, whitespaces=True)
             balance_str = self.parent.format_amount(balance, whitespaces=True)
-            label = self.wallet.get_label(tx_hash)
+            tx = self.wallet.transactions.get(tx_hash)
+            tx.deserialize()
+            #label = tx['outputs'][0]['scriptPubKey'] # self.wallet.transactions.get(tx_hash).deserialize().get_outputs()[1][0] # self.wallet.get_label(tx_hash)
+            label = "empty";
+            for output in tx._outputs:
+                if output[2] is 0:
+                    label = output[1]
+            lenght = int(label[6:8], 10) * 2 + 8
+            label = bytes.fromhex(label[8:lenght]).decode('utf-8')
+
             entry = ['', tx_hash, status_str, label, v_str, balance_str]
             if fx and fx.show_history():
                 date = timestamp_to_datetime(time.time() if conf <= 0 else timestamp)

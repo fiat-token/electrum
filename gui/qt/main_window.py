@@ -760,7 +760,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         grid.addWidget(self.receive_address_e, 0, 1, 1, -1)
 
         self.receive_message_e = QLineEdit()
-        grid.addWidget(QLabel(_('Description')), 1, 0)
+        grid.addWidget(QLabel(_('Note')), 1, 0)
         grid.addWidget(self.receive_message_e, 1, 1, 1, -1)
         self.receive_message_e.textChanged.connect(self.update_receive_qr)
 
@@ -1012,7 +1012,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         msg = _('Description of the transaction (not mandatory).') + '\n\n'\
               + _('The description is not sent to the recipient of the funds. It is stored in your wallet file, and displayed in the \'History\' tab.')
-        description_label = HelpLabel(_('Description'), msg)
+        description_label = HelpLabel(_('Note'), msg)
         grid.addWidget(description_label, 2, 0)
         self.message_e = MyLineEdit()
         grid.addWidget(self.message_e, 2, 1, 1, -1)
@@ -2808,7 +2808,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 grid.addWidget(cb, i, 0)
                 enable_settings_widget(p, name, i)
                 cb.clicked.connect(partial(do_toggle, cb, name, i))
-                msg = descr['description']
+                msg = descr['Note']
                 if descr.get('requires'):
                     msg += '\n\n' + _('Requires') + ':\n' + '\n'.join(map(lambda x: x[1], descr.get('requires')))
                 grid.addWidget(HelpButton(msg), i, 2)
