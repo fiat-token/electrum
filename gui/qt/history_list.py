@@ -91,12 +91,15 @@ class HistoryList(MyTreeWidget):
             tx = self.wallet.transactions.get(tx_hash)
             tx.deserialize()
             #label = tx['outputs'][0]['scriptPubKey'] # self.wallet.transactions.get(tx_hash).deserialize().get_outputs()[1][0] # self.wallet.get_label(tx_hash)
-            label = "empty";
-            for output in tx._outputs:
-                if output[2] is 0:
-                    label = output[1]
-            lenght = int(label[6:8], 10) * 2 + 8
-            label = bytes.fromhex(label[8:lenght]).decode('utf-8')
+            label = "empty"
+            for code, data, amount in tx._outputs:
+                if code == 2:                    
+                    label = data # bytes.fromhex(data).decode('utf-8')
+                    break
+                    
+            if label[4:6] in ['1c', '1d', '1e']:
+                lenght = int(label[6:8], 16) * 2 + 8
+                label = bytes.fromhex(label[8:lenght]).decode('utf-8')
 
             entry = ['', tx_hash, status_str, label, v_str, balance_str]
             if fx and fx.show_history():

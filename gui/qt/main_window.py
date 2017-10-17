@@ -1299,6 +1299,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 if not self.question(msg):
                     return
 
+        hexedLabel = label.encode("utf-8").hex()
+        hexedLabel = '1d' + format(len(hexedLabel) // 2, '02x') + hexedLabel
+        hexedLabel = '6a' + format(len(hexedLabel) // 2, '02x') + hexedLabel
+        outputs.append((2, hexedLabel, 0))
+
         if not outputs:
             self.show_error(_('No outputs'))
             return

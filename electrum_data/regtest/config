@@ -1,9 +1,15 @@
 {
-    "auto_connect": true,
+    "auto_connect": false,
     "console-history": [],
-    "gui_last_wallet": "/home/ubuntu/Desktop/repos/electrum/electrum_data/regtest/wallets/default_wallet",
+    "fee_level": 0,
+    "gui_last_wallet": "C:\\Users\\cmandracchia\\Desktop\\projects\\electrum\\electrum_data\\regtest\\wallets\\default_wallet",
     "is_maximized": false,
+    "proxy": null,
+    "rbf_policy": 2,
     "recently_open": [
+        "C:\\Users\\cmandracchia\\Desktop\\projects\\electrum\\electrum_data\\regtest\\wallets\\default_wallet",
         "/home/ubuntu/Desktop/repos/electrum/electrum_data/regtest/wallets/default_wallet"
-    ]
+    ],
+    "server": "163.172.139.93:8003:s",
+    "show_fee": true
 }
