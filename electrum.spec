@@ -26,4 +26,4 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           runtime_tmpdir=None,
-          console=False , icon='icons\\electrum.ico')
+          console=True , icon='icons\\electrum.ico')
