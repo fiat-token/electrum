@@ -128,7 +128,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.create_status_bar()
         self.need_update = threading.Event()
 
-        self.decimal_point = config.get('decimal_point', 5)
+        self.decimal_point = config.get('decimal_point', 4)
         self.fee_unit = config.get('fee_unit', 0)
         self.num_zeros     = int(config.get('num_zeros',0))
 
@@ -531,7 +531,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         d = self.network.get_donation_address()
         if d:
             host = self.network.get_parameters()[0]
-            self.pay_to_URI('bitcoin:%s?message=donation for %s'%(d, host))
+            self.pay_to_URI('vtkn:%s?message=donation for %s'%(d, host))
         else:
             self.show_error(_('No donation address for this server'))
 
@@ -631,13 +631,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         return self.decimal_point
 
     def base_unit(self):
-        assert self.decimal_point in [2, 5, 8]
-        if self.decimal_point == 2:
-            return 'bits'
-        if self.decimal_point == 5:
-            return 'mBTC'
-        if self.decimal_point == 8:
-            return 'BTC'
+        assert self.decimal_point in [4]
+        if self.decimal_point == 4:
+            return 'vTKN'
         raise Exception('Unknown base unit')
 
     def connect_fields(self, window, btc_e, fiat_e, fee_e):
@@ -769,7 +765,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         grid.addWidget(self.receive_address_e, 0, 1, 1, -1)
 
         self.receive_message_e = QLineEdit()
-        grid.addWidget(QLabel(_('Description')), 1, 0)
+        grid.addWidget(QLabel(_('Note')), 1, 0)
         grid.addWidget(self.receive_message_e, 1, 1, 1, -1)
         self.receive_message_e.textChanged.connect(self.update_receive_qr)
 
@@ -1020,7 +1016,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         msg = _('Description of the transaction (not mandatory).') + '\n\n'\
               + _('The description is not sent to the recipient of the funds. It is stored in your wallet file, and displayed in the \'History\' tab.')
-        description_label = HelpLabel(_('Description'), msg)
+        description_label = HelpLabel(_('Note'), msg)
         grid.addWidget(description_label, 2, 0)
         self.message_e = MyLineEdit()
         grid.addWidget(self.message_e, 2, 1, 1, -1)
@@ -1307,6 +1303,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 if not self.question(msg):
                     return
 
+        hexedLabel = label.encode("utf-8").hex()
+        hexedLabel = '1d' + format(len(hexedLabel) // 2, '02x') + hexedLabel
+        hexedLabel = '6a' + format(len(hexedLabel) // 2, '02x') + hexedLabel
+        outputs.append((2, hexedLabel, 0))
+
         if not outputs:
             self.show_error(_('No outputs'))
             return
@@ -1353,10 +1354,6 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         use_rbf = self.rbf_checkbox.isChecked()
         if use_rbf:
             tx.set_rbf(True)
-
-        if fee < self.wallet.relayfee() * tx.estimated_size() / 1000 and tx.requires_fee(self.wallet):
-            self.show_error(_("This transaction requires a higher fee, or it will not be propagated by the network"))
-            return
 
         if preview:
             self.show_transaction(tx, tx_desc)
@@ -1725,7 +1722,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                                  'network' : self.network,
                                  'plugins' : self.gui_object.plugins,
                                  'window': self})
-        console.updateNamespace({'util' : util, 'bitcoin':bitcoin})
+        console.updateNamespace({'util' : util, 'vtkn':bitcoin})
 
         c = commands.Commands(self.config, self.wallet, self.network, lambda: self.console.set_json(True))
         methods = {}
@@ -2096,7 +2093,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if not data:
             return
         # if the user scanned a bitcoin URI
-        if str(data).startswith("bitcoin:"):
+        if str(data).startswith("vtkn:"):
             self.pay_to_URI(data)
             return
         # else if the user scanned an offline signed tx
@@ -2564,9 +2561,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         SSL_id_e.setReadOnly(True)
         id_widgets.append((SSL_id_label, SSL_id_e))
 
-        units = ['BTC', 'mBTC', 'bits']
+        units = ['vTKN']
         msg = _('Base unit of your wallet.')\
-              + '\n1BTC=1000mBTC.\n' \
+              + '\n1BTC=1000vTKN.\n' \
               + _(' These settings affects the fields in the Send tab')+' '
         unit_label = HelpLabel(_('Base unit') + ':', msg)
         unit_combo = QComboBox()
@@ -2578,12 +2575,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 return
             edits = self.amount_e, self.fee_e, self.receive_amount_e
             amounts = [edit.get_amount() for edit in edits]
-            if unit_result == 'BTC':
-                self.decimal_point = 8
-            elif unit_result == 'mBTC':
-                self.decimal_point = 5
-            elif unit_result == 'bits':
-                self.decimal_point = 2
+            if unit_result == 'vTKN':
+                self.decimal_point = 4
             else:
                 raise Exception('Unknown base unit')
             self.config.set_key('decimal_point', self.decimal_point, True)
@@ -2880,7 +2873,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 grid.addWidget(cb, i, 0)
                 enable_settings_widget(p, name, i)
                 cb.clicked.connect(partial(do_toggle, cb, name, i))
-                msg = descr['description']
+                msg = descr['note']
                 if descr.get('requires'):
                     msg += '\n\n' + _('Requires') + ':\n' + '\n'.join(map(lambda x: x[1], descr.get('requires')))
                 grid.addWidget(HelpButton(msg), i, 2)

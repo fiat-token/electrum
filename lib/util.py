@@ -44,7 +44,7 @@ def inv_dict(d):
     return {v: k for k, v in d.items()}
 
 
-base_units = {'BTC':8, 'mBTC':5, 'uBTC':2}
+base_units = {'vTKN':4}
 fee_levels = [_('Within 25 blocks'), _('Within 10 blocks'), _('Within 5 blocks'), _('Within 2 blocks'), _('In the next block')]
 
 def normalize_version(v):
@@ -474,9 +474,25 @@ testnet_block_explorers = {
                        {'tx': 'tx', 'addr': 'address'}),
 }
 
+regtest_block_explorers = {
+    'Blocktrail.com': ('https://www.blocktrail.com/tBTC',
+                       {'tx': 'tx', 'addr': 'address'}),
+    'system default': ('blockchain:',
+                       {'tx': 'tx', 'addr': 'address'}),
+}
+
+regtest = {
+    'system default': ('blockchain:',
+                       {'tx': 'tx', 'addr': 'address'})
+}
+
 def block_explorer_info():
     from . import bitcoin
-    return testnet_block_explorers if bitcoin.TESTNET else mainnet_block_explorers
+    if bitcoin.TESTNET == True:
+        return testnet_block_explorers
+    if bitcoin.REGTEST == True:
+        return regtest_block_explorers 
+    return mainnet_block_explorers
 
 def block_explorer(config):
     return config.get('block_explorer', 'Blocktrail.com')
@@ -508,7 +524,7 @@ def parse_URI(uri, on_pr=None):
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
-    if u.scheme != 'bitcoin':
+    if u.scheme != 'vtkn':
         raise BaseException("Not a bitcoin URI")
     address = u.path
 
@@ -576,7 +592,7 @@ def create_URI(addr, amount, message):
         query.append('amount=%s'%format_satoshis_plain(amount))
     if message:
         query.append('message=%s'%urllib.parse.quote(message))
-    p = urllib.parse.ParseResult(scheme='bitcoin', netloc='', path=addr, params='', query='&'.join(query), fragment='')
+    p = urllib.parse.ParseResult(scheme='vtkn', netloc='', path=addr, params='', query='&'.join(query), fragment='')
     return urllib.parse.urlunparse(p)
 
 

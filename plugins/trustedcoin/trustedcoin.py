@@ -221,7 +221,7 @@ class Wallet_2fa(Multisig_Wallet):
             outputs = [(_type, addr, sendable)]
         dummy_tx = Transaction.from_io(inputs, outputs)
         if fee is None:
-            fee = self.estimate_fee(config, dummy_tx.estimated_size())
+            fee = 0
         amount = max(0, sendable - fee)
         return amount, fee
 

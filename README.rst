@@ -1,3 +1,9 @@
+For regtest mode follow the "Development version" steps and launch with regtest parameter:
+
+./electrum --regtest
+
+Down below the original guide
+
 Electrum - Lightweight Bitcoin client
 =====================================
 

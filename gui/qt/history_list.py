@@ -38,11 +38,11 @@ TX_ICONS = [
     "warning.png",
     "unconfirmed.png",
     "unconfirmed.png",
-    "clock1.png",
-    "clock2.png",
-    "clock3.png",
-    "clock4.png",
-    "clock5.png",
+    "confirmed.png",
+    "confirmed.png",
+    "confirmed.png",
+    "confirmed.png",
+    "confirmed.png",
     "confirmed.png",
 ]
 
@@ -56,7 +56,7 @@ class HistoryList(MyTreeWidget):
         self.setColumnHidden(1, True)
 
     def refresh_headers(self):
-        headers = ['', '', _('Date'), _('Description') , _('Amount'), _('Balance')]
+        headers = ['', '', _('Date'), _('Note') , _('Amount'), _('Balance')]
         fx = self.parent.fx
         if fx and fx.show_history():
             headers.extend(['%s '%fx.ccy + _('Amount'), '%s '%fx.ccy + _('Balance')])
@@ -83,6 +83,18 @@ class HistoryList(MyTreeWidget):
             v_str = self.parent.format_amount(value, True, whitespaces=True)
             balance_str = self.parent.format_amount(balance, whitespaces=True)
             label = self.wallet.get_label(tx_hash)
+            tx = self.wallet.transactions.get(tx_hash)
+            tx.deserialize()
+            label = "empty"
+            for code, data, amount in tx._outputs:
+                if code == 2:                       
+                    label = data # bytes.fromhex(data).decode('utf-8')
+                    break
+
+            if label[4:6] in ['1c', '1d', '1e']:
+                lenght = int(label[6:8], 16) * 2 + 8
+                label = bytes.fromhex(label[8:lenght]).decode('utf-8')
+
             entry = ['', tx_hash, status_str, label, v_str, balance_str]
             if fx and fx.show_history():
                 date = timestamp_to_datetime(time.time() if conf <= 0 else timestamp)
