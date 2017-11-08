@@ -17,6 +17,7 @@ env/
 .buildozer/
 bin/
 electrum_data/
+/electrum.spec
 
 # tox files
 .cache/
