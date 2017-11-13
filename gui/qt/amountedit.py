@@ -78,7 +78,7 @@ class BTCAmountEdit(AmountEdit):
 
     def _base_unit(self):
         p = self.decimal_point()
-		assert p in [2, 4, 5, 8]
+        assert p in [2, 4, 5, 8]
         if p == 4:
             return 'vTKN'
         raise Exception('Unknown base unit')
