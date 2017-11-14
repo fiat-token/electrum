@@ -76,7 +76,7 @@ WIF_PREFIX = 0xAB
 ADDRTYPE_P2PKH = 70
 ADDRTYPE_P2SH = 63
 SEGWIT_HRP = "bc"
-HEADERS_URL = "https://headers.electrum.org/blockchain_headers"
+HEADERS_URL =  "" # "https://headers.electrum.org/blockchain_headers"
 GENESIS = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
 SERVERLIST = 'servers.json'
 DEFAULT_PORTS = {'t':'50001', 's':'50002'}
@@ -94,7 +94,7 @@ def set_testnet():
     ADDRTYPE_P2PKH = 111
     ADDRTYPE_P2SH = 196
     SEGWIT_HRP = "tb"
-    HEADERS_URL = "https://headers.electrum.org/testnet_headers"
+    HEADERS_URL = "http://127.0.0.1:6969/api/media/download/blockchain_headers" # "https://headers.electrum.org/testnet_headers"
     GENESIS = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"
     SERVERLIST = 'servers_testnet.json'
     DEFAULT_PORTS = {'t':'51001', 's':'51002'}

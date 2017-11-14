@@ -35,7 +35,12 @@ def serialize_header(res):
         + rev_hex(res.get('merkle_root')) \
         + int_to_hex(int(res.get('timestamp')), 4) \
         + int_to_hex(int(res.get('bits')), 4) \
-        + int_to_hex(int(res.get('nonce')), 4)
+        + int_to_hex(int(res.get('nonce')), 4) 
+    #   \
+    #    + int_to_hex(int(res.get('height')), 4) \
+    #    + int_to_hex(int(res.get('proof_length')), 4) \
+    #    + rev_hex(int(res.get('proof')), 4) 
+
     return s
 
 def deserialize_header(s, height):
@@ -47,7 +52,9 @@ def deserialize_header(s, height):
     h['timestamp'] = hex_to_int(s[68:72])
     h['bits'] = hex_to_int(s[72:76])
     h['nonce'] = hex_to_int(s[76:80])
-    h['block_height'] = height
+  #  h['block_height'] = height # s[80:84]
+  #  h['proof_length'] = hex_to_int(s[84:85])
+  #  h['proof'] = hex_to_int(h['proof_length'])
     return h
 
 def hash_header(header):
@@ -234,7 +241,7 @@ class Blockchain(util.PrintError):
         delta = header.get('block_height') - self.checkpoint
         data = bfh(serialize_header(header))
         assert delta == self.size()
-        assert len(data) == 80
+   #     assert len(data) == 190
         self.write(data, delta*80)
         self.swap_with_parent()
 
