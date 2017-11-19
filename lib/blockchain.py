@@ -36,11 +36,22 @@ def serialize_header(res):
         + int_to_hex(int(res.get('timestamp')), 4) \
         + int_to_hex(int(res.get('bits')), 4) \
         + int_to_hex(int(res.get('nonce')), 4) \
-       + int_to_hex(int(res.get('block_height')), 4) \
-       + int_to_hex(int(res.get('proof_length')), 4) \
-       + rev_hex(res.get('proof')) \
-       + int_to_hex(int(res.get('sign_length')), 4) \
-       + rev_hex(res.get('sign')) 
+        + int_to_hex(int(res.get('block_height')), 4) \
+
+    return s
+
+def serialize_header_signed(res):
+    s = int_to_hex(res.get('version'), 4) \
+        + rev_hex(res.get('prev_block_hash')) \
+        + rev_hex(res.get('merkle_root')) \
+        + int_to_hex(int(res.get('timestamp')), 4) \
+        + int_to_hex(int(res.get('bits')), 4) \
+        + int_to_hex(int(res.get('nonce')), 4) \
+        + int_to_hex(int(res.get('block_height')), 4) \
+        + int_to_hex(int(res.get('proof_length')), 4) \
+        + rev_hex(res.get('proof')) \
+        + int_to_hex(int(res.get('sign_length')), 4) \
+        + rev_hex(res.get('sign')) 
 
     return s
 
@@ -54,12 +65,13 @@ def deserialize_header(s, height):
     h['bits'] = hex_to_int(s[72:76])
     h['nonce'] = hex_to_int(s[76:80])
     h['block_height'] = height # s[80:84]
-#    h['proof_length'] = hex_to_int(s[84:85])
-#    proofEnd = 85 + h['proof_length']
-#    h['proof'] = hash_encode(s[85:proofEnd])
-#    h['sign_length'] = hex_to_int(s[proofEnd:proofEnd + 1])
-#    signEnd = proofEnd + 1 + h['sign_length']
-#    h['sign'] = hash_encode(s[proofEnd + 1:signEnd])
+    if len(s) > 80:
+        h['proof_length'] = hex_to_int(s[84:85])
+        proofEnd = 85 + h['proof_length']
+        h['proof'] = hash_encode(s[85:proofEnd])
+        h['sign_length'] = hex_to_int(s[proofEnd:proofEnd + 1])
+        signEnd = proofEnd + 1 + h['sign_length']
+        h['sign'] = hash_encode(s[proofEnd + 1:signEnd])
     return h
 
 def hash_header(header):
@@ -67,7 +79,10 @@ def hash_header(header):
         return '0' * 64
     if header.get('prev_block_hash') is None:
         header['prev_block_hash'] = '00'*32
-    return hash_encode(Hash(bfh(serialize_header(header))))
+    if len(header) == 7:
+        return hash_encode(Hash(bfh(serialize_header(header))))
+    elif len(header) == 11:
+        return hash_encode(Hash(bfh(serialize_header_signed(header))))
 
 
 blockchains = {}
@@ -112,6 +127,7 @@ class Blockchain(util.PrintError):
         self.checkpoint = checkpoint
         self.parent_id = parent_id
         self.lock = threading.Lock()
+        self.checkpointByte = 0
         with self.lock:
             self.update_size()
 
@@ -246,8 +262,8 @@ class Blockchain(util.PrintError):
         delta = header.get('block_height') - self.checkpoint
         data = bfh(serialize_header(header))
         assert delta == self.size()
-   #     assert len(data) == 190
-        self.write(data, delta*190)
+   #     assert len(data) == 80
+        self.write(data, delta*80)
         self.swap_with_parent()
 
     def read_header(self, height):
@@ -262,10 +278,16 @@ class Blockchain(util.PrintError):
         name = self.path()
         if os.path.exists(name):
             f = open(name, 'rb')
-            f.seek(delta * 80)
-            h = f.read(80)
+            f.seek(self.checkpointByte)
+            h = f.read(1000)
             f.close()
-        return deserialize_header(h, height)
+        header = deserialize_header(h, height)
+        if len(header) == 7:
+            header_serialized = serialize_header(header)
+        elif len(header) == 11:
+            header_serialized = serialize_header_signed(header)
+        self.checkpointByte += len(header_serialized)
+        return header
 
     def get_hash(self, height):
         return hash_header(self.read_header(height))
