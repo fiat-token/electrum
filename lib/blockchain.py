@@ -41,19 +41,22 @@ def serialize_header(res):
     return s
 
 def serialize_header_signed(res):
-    s = int_to_hex(res.get('version'), 4) \
-        + rev_hex(res.get('prev_block_hash')) \
-        + rev_hex(res.get('merkle_root')) \
-        + int_to_hex(int(res.get('timestamp')), 4) \
-        + int_to_hex(int(res.get('bits')), 4) \
-        + int_to_hex(int(res.get('nonce')), 4) \
-        + int_to_hex(int(res.get('block_height')), 4) \
-        + int_to_hex(int(res.get('proof_length')), 4) \
-        + rev_hex(res.get('proof')) \
-        + int_to_hex(int(res.get('sign_length')), 4) \
-        + rev_hex(res.get('sign')) 
-
-    return s
+    try:
+        version = int_to_hex(res.get('version'), 4)
+        prev_block_hash = rev_hex(res.get('prev_block_hash'))
+        merkle_root = rev_hex(res.get('merkle_root'))
+        timestamp = int_to_hex(int(res.get('timestamp')), 4)
+        bits = int_to_hex(int(res.get('bits')), 4)
+        nonce = int_to_hex(int(res.get('nonce')), 4)
+        block_height = int_to_hex(int(res.get('block_height')), 4)
+        proof_length = str(int_to_hex(res.get('proof_length')))
+        proof = rev_hex(res.get('proof'))
+        sign_length = str(int_to_hex(res.get('sign_length')))
+        sign = rev_hex(res.get('sign'))
+        serialized_block = "".join((version, prev_block_hash, merkle_root, timestamp, bits, nonce, block_height, proof_length, proof, sign_length, sign))
+    except Error as e:
+        print(e)
+    return serialized_block
 
 def deserialize_header(s, height):
     hex_to_int = lambda s: int('0x' + bh2u(s[::-1]), 16)
