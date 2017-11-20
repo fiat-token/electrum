@@ -167,7 +167,7 @@ class Blockchain(util.PrintError):
         return self
 
     def height(self):
-        return len(self.headers) # self.checkpoint + self.size() - 1
+        return len(self.headers) - 1 # self.checkpoint + self.size() - 1
 
     def size(self):
         with self.lock:
@@ -294,7 +294,9 @@ class Blockchain(util.PrintError):
             return
         if not self.headers:
             self.read_headers()
-        if self.height() != 0 and height == self.height():
+        if self.height() == 0:
+            return
+        if height == self.height():
             return
         return self.headers[height]
 
@@ -322,8 +324,10 @@ class Blockchain(util.PrintError):
             f = open(name, 'rb')
             headersFile = f.read()
             f.close()
+        else:
+            return
         position = 0
-        while position < len(headersFile):
+        while headersFile and position < len(headersFile):
             h = {}
 
             h['version'], position = self.parser(headersFile, position, 8)

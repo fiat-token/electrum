@@ -94,7 +94,7 @@ def set_testnet():
     ADDRTYPE_P2PKH = 111
     ADDRTYPE_P2SH = 196
     SEGWIT_HRP = "tb"
-    HEADERS_URL = "http://127.0.0.1:6969/api/media/download/blockchain_headers" # "https://headers.electrum.org/testnet_headers"
+    HEADERS_URL = "http://52.57.189.81/blockchain_headers" # "https://headers.electrum.org/testnet_headers"
     GENESIS = "fecda7660014b377f1043fdbe176431cd110242c59d273c5a815466dda41344d"
     SERVERLIST = 'servers_testnet.json'
     DEFAULT_PORTS = {'t':'51001', 's':'51002'}
