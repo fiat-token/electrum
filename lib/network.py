@@ -956,10 +956,14 @@ class Network(util.DaemonThread):
                 import urllib.request, socket
                 socket.setdefaulttimeout(30)
                 self.print_error("downloading ", bitcoin.HEADERS_URL)
+                try:
+                    os.remove(filename)
+                except OSError:
+                    pass
                 urllib.request.urlretrieve(bitcoin.HEADERS_URL, filename + '.tmp')
                 os.rename(filename + '.tmp', filename)
                 self.print_error("done.")
-            except Exception:
+            except Exception as err:
                 self.print_error("download failed. creating file", filename)
                 open(filename, 'wb+').close()
             b = self.blockchains[0]
