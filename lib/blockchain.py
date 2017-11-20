@@ -131,6 +131,7 @@ class Blockchain(util.PrintError):
         self.parent_id = parent_id
         self.lock = threading.Lock()
         self.checkpointByte = 0
+        self.headers = []
         with self.lock:
             self.update_size()
 
@@ -164,7 +165,7 @@ class Blockchain(util.PrintError):
         return self
 
     def height(self):
-        return self.checkpoint + self.size() - 1
+        return len(self.headers) # self.checkpoint + self.size() - 1
 
     def size(self):
         with self.lock:
@@ -172,7 +173,7 @@ class Blockchain(util.PrintError):
 
     def update_size(self):
         p = self.path()
-        self._size = os.path.getsize(p)//80 if os.path.exists(p) else 0
+        self._size = len(self.headers) # os.path.getsize(p)//80 if os.path.exists(p) else 0
 
     def verify_header(self, header, prev_header, bits, target):
         prev_hash = hash_header(prev_header)
@@ -269,28 +270,68 @@ class Blockchain(util.PrintError):
         self.write(data, delta*80)
         self.swap_with_parent()
 
+    # def read_header(self, height):
+    #     assert self.parent_id != self.checkpoint
+    #     if height < 0:
+    #         return
+    #     if height < self.checkpoint:
+    #         return self.parent().read_header(height)
+    #     if height > self.height():
+    #         return
+    #     delta = height - self.checkpoint
+    #     name = self.path()
+    #     if os.path.exists(name):
+    #         f = open(name, 'rb')
+    #         f.seek(delta * 80)
+    #         h = f.read(80)
+    #         f.close()
+    #     header = deserialize_header(h, height)
+    #     if len(header) == 7:
+    #         header_serialized = serialize_header(header)
+    #     elif len(header) == 11:
+    #         header_serialized = serialize_header_signed(header)
+    #     self.checkpointByte += len(header_serialized)
+    #     return header
+
     def read_header(self, height):
-        assert self.parent_id != self.checkpoint
-        if height < 0:
-            return
-        if height < self.checkpoint:
-            return self.parent().read_header(height)
-        if height > self.height():
-            return
-        delta = height - self.checkpoint
+        return self.headers[height]
+
+    def read_headers(self):
         name = self.path()
         if os.path.exists(name):
             f = open(name, 'rb')
-            f.seek(self.checkpointByte)
-            h = f.read(1000)
+            headersFile = f.read()
             f.close()
-        header = deserialize_header(h, height)
-        if len(header) == 7:
-            header_serialized = serialize_header(header)
-        elif len(header) == 11:
-            header_serialized = serialize_header_signed(header)
-        self.checkpointByte += len(header_serialized)
-        return header
+        position = 0
+        while position < len(headersFile):
+            hex_to_int = lambda s: int('0x' + bh2u(s[::-1]), 16)
+            h = {}
+            versionEnd = position + 4
+            h['version'] = hex_to_int(headersFile[position:versionEnd])
+            prev_block_hashEnd = versionEnd + 32
+            h['prev_block_hash'] = hash_encode(headersFile[versionEnd:prev_block_hashEnd])
+            merkle_rootEnd = prev_block_hashEnd + 32
+            h['merkle_root'] = hash_encode(headersFile[prev_block_hashEnd:merkle_rootEnd])
+            timestampEnd = merkle_rootEnd + 4
+            h['timestamp'] = hex_to_int(headersFile[merkle_rootEnd:timestampEnd])
+            bitsEnd = timestampEnd + 4
+            h['bits'] = hex_to_int(headersFile[timestampEnd:bitsEnd])
+            nonceEnd = bitsEnd + 4
+            h['nonce'] = hex_to_int(headersFile[bitsEnd:nonceEnd])
+            block_heightEnd = nonceEnd + 4
+            h['block_height'] = hex_to_int(headersFile[nonceEnd:block_heightEnd]) 
+            proof_lengthEnd = block_heightEnd + 1
+            # h['proof_length'] = hex_to_int(headersFile[block_heightEnd:proof_lengthEnd])
+            h['proof_length'] = headersFile[block_heightEnd]
+            proofEnd = proof_lengthEnd + h['proof_length']
+            h['proof'] = hash_encode(headersFile[proof_lengthEnd:proofEnd])
+            sign_lengthEnd = proofEnd + 1
+            # h['sign_length'] = hex_to_int(headersFile[proofEnd:sign_lengthEnd])
+            h['sign_length'] = headersFile[proofEnd]
+            signEnd = sign_lengthEnd + h['sign_length']
+            h['sign'] = hash_encode(headersFile[sign_lengthEnd:signEnd])
+            self.headers.append(h)
+            position = signEnd
 
     def get_hash(self, height):
         return hash_header(self.read_header(height))
