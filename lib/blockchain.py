@@ -155,8 +155,8 @@ class Blockchain(util.PrintError):
     def check_header(self, header):
         header_hash = hash_header(header)
         height = header.get('block_height')
-        if height == self.height():
-            self.headers.append(header)
+        if height == self.height() + 1:
+            self.save_header(header)
         return header_hash == self.get_hash(height)
 
     def fork(parent, header):
@@ -174,7 +174,7 @@ class Blockchain(util.PrintError):
             return self._size
 
     def update_size(self):
-        p = self.path()
+        # p = self.path()
         self._size = len(self.headers) - 1 # os.path.getsize(p)//80 if os.path.exists(p) else 0
 
     def verify_header(self, header, prev_header, bits, target):

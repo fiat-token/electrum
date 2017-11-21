@@ -947,9 +947,9 @@ class Network(util.DaemonThread):
 
     def init_headers_file(self):
         b = self.blockchains[0]
-        if b.get_hash(0) == bitcoin.GENESIS:
-            self.downloading_headers = False
-            return
+        # if b.get_hash(0) == bitcoin.GENESIS:
+        #     self.downloading_headers = False
+        #     return
         filename = b.path()
         def download_thread():
             try:
