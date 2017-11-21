@@ -51,14 +51,15 @@ def serialize_header_signed(res, sign=False):
         block_height = int_to_hex(int(res.get('block_height')), 4)
         proof_length = str(int_to_hex(res.get('proof_length')))
         proof = rev_hex(res.get('proof'))
+        serialized_block = "".join((version, prev_block_hash, merkle_root, timestamp, bits, nonce, block_height, proof_length, proof))
         if sign:
             sign_length = str(int_to_hex(res.get('sign_length')))
             sign = rev_hex(res.get('sign'))
             serialized_block = "".join((version, prev_block_hash, merkle_root, timestamp, bits, nonce, block_height, proof_length, proof, sign_length, sign))
-        else:
-            serialized_block = "".join((version, prev_block_hash, merkle_root, timestamp, bits, nonce, block_height, proof_length, proof))
-    except Error as e:
+            
+    except Exception as e:
         print(e)
+
     return serialized_block
 
 def deserialize_header(s, height):
