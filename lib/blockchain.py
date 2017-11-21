@@ -175,7 +175,7 @@ class Blockchain(util.PrintError):
 
     def update_size(self):
         p = self.path()
-        self._size = len(self.headers) # os.path.getsize(p)//80 if os.path.exists(p) else 0
+        self._size = len(self.headers) - 1 # os.path.getsize(p)//80 if os.path.exists(p) else 0
 
     def verify_header(self, header, prev_header, bits, target):
         prev_hash = hash_header(prev_header)
@@ -263,7 +263,7 @@ class Blockchain(util.PrintError):
         # assert delta == self.size()
    #     assert len(data) == 80
         self.headers.append(header)
-        self.write(data)
+        self.write(data, 0)
         # self.swap_with_parent()
 
     # def read_header(self, height):
@@ -290,20 +290,19 @@ class Blockchain(util.PrintError):
     #     return header
 
     def read_header(self, height):
-        if height > self.height():
-            return
         if not self.headers:
             self.read_headers()
         if self.height() == 0:
             return
-        if height == self.height():
+        if height > self.height():
             return
+        
         return self.headers[height]
 
     def switch_endians(self, str_hex):
         ''' switch endians '''
         if isinstance(str_hex, (bytearray, bytes)):
-            str_hex = str_hex.decode()
+            str_hex = str_hex.decode("utf-8")
         str_final = ''
         for index in range(len(str_hex), 0, -2):
             str_final += str_hex[index-2:index]
@@ -312,7 +311,7 @@ class Blockchain(util.PrintError):
     def parser(self, array, begin, end, encode=False):
         end += begin
         if encode:
-            value = hash_encode(array[begin:end])
+            value = self.switch_endians(array[begin:end])
         else:
             value = int(self.switch_endians(array[begin:end]), 16)
         return (value, end)
