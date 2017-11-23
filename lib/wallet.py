@@ -790,9 +790,10 @@ class Abstract_Wallet(PrintError):
 
     def dust_threshold(self):
         # Change <= dust threshold is added to the tx fee
-        return 182 * 3 * self.relayfee() / 1000
+        return 0 # 182 * 3 * self.relayfee() / 1000
 
     def make_unsigned_transaction(self, inputs, outputs, config, fixed_fee=None, change_addr=None):
+        #fixed_fee = 0
         # check outputs
         i_max = None
         for i, o in enumerate(outputs):
@@ -840,6 +841,7 @@ class Abstract_Wallet(PrintError):
         if i_max is None:
             # Let the coin chooser select the coins to spend
             max_change = self.max_change_outputs if self.multiple_change else 1
+            max_change = 1
             coin_chooser = coinchooser.get_coin_chooser(config)
             tx = coin_chooser.make_tx(inputs, outputs, change_addrs[:max_change],
                                       fee_estimator, self.dust_threshold())

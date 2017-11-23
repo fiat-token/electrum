@@ -199,7 +199,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.new_fx_history_signal.connect(self.on_fx_history)
 
         # update fee slider in case we missed the callback
-        self.fee_slider.update()
+        #self.fee_slider.update()
         self.load_wallet(wallet)
         self.connect_slots(gui_object.timer)
         self.fetch_alias()
@@ -306,8 +306,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.history_list.update_item(*args)
         elif event == 'fee':
             if self.config.is_dynfee():
-                self.fee_slider.update()
-                self.do_update_fee()
+                pass
+                #self.fee_slider.update()
+                #self.do_update_fee()
         else:
             self.print_error("unexpected network_qt signal:", event, args)
 
@@ -608,7 +609,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.payto_e.resolve()
         # update fee
         if self.require_fee_update:
-            self.do_update_fee()
+            #self.do_update_fee()
             self.require_fee_update = False
 
     def format_amount(self, x, is_diff=False, whitespaces=False):
@@ -1061,7 +1062,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 self.config.set_key('fee_level', pos, False)
             else:
                 self.config.set_key('fee_per_kb', fee_rate, False)
-            self.spend_max() if self.is_max else self.update_fee()
+            if self.is_max:
+                self.spend_max() # if self.is_max else self.update_fee()
 
         self.fee_slider = FeeSlider(self, self.config, fee_cb)
         self.fee_slider.setFixedWidth(140)
@@ -1069,10 +1071,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.fee_e = BTCAmountEdit(self.get_decimal_point)
         if not self.config.get('show_fee', False):
             self.fee_e.setVisible(False)
-        self.fee_e.textEdited.connect(self.update_fee)
+        #self.fee_e.textEdited.connect(self.update_fee)
+        self.fee_e.setAmount(0)
         # This is so that when the user blanks the fee and moves on,
         # we go back to auto-calculate mode and put a fee back.
-        self.fee_e.editingFinished.connect(self.update_fee)
+        #self.fee_e.editingFinished.connect(self.update_fee)
         self.connect_fields(self, self.amount_e, self.fiat_send_e, self.fee_e)
 
         self.rbf_checkbox = QCheckBox(_('Replaceable'))
@@ -2479,6 +2482,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         dynfee_cb.setToolTip(_("Use fees recommended by the server."))
         fee_widgets.append((dynfee_cb, None))
         dynfee_cb.stateChanged.connect(on_dynfee)
+        self.config.set_key('dynamic_fees', False)
+        dynfee_cb.setChecked(False)
 
         feebox_cb = QCheckBox(_('Edit fees manually'))
         feebox_cb.setChecked(self.config.get('show_fee', False))
@@ -2487,6 +2492,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.config.set_key('show_fee', x == Qt.Checked)
             self.fee_e.setVisible(bool(x))
         feebox_cb.stateChanged.connect(on_feebox)
+        feebox_cb.setChecked(self.config.get('show_fee', True))
         fee_widgets.append((feebox_cb, None))
 
         rbf_policy = self.config.get('rbf_policy', 1)
