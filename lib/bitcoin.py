@@ -79,7 +79,7 @@ SEGWIT_HRP = "bc"
 HEADERS_URL =  "http://35.158.144.110/blockchain_headers" # "https://headers.electrum.org/blockchain_headers"
 GENESIS = "e6db4c0f012608df0119b7afb76e02e79e0bd4964809680b75ab6bbf6921c47c"
 SERVERLIST = 'servers.json'
-DEFAULT_PORTS = {'t':'50001', 's':'50002'}
+DEFAULT_PORTS = {'t':'8000', 's':'443'}
 DEFAULT_SERVERS = read_json_dict('servers.json')
 
 def set_testnet():
@@ -97,7 +97,7 @@ def set_testnet():
     HEADERS_URL = "http://52.57.189.81/blockchain_headers" # "https://headers.electrum.org/testnet_headers"
     GENESIS = "fecda7660014b377f1043fdbe176431cd110242c59d273c5a815466dda41344d"
     SERVERLIST = 'servers_testnet.json'
-    DEFAULT_PORTS = {'t':'51001', 's':'51002'}
+    DEFAULT_PORTS = {'t':'8001', 's':'8002'}
     DEFAULT_SERVERS = read_json_dict('servers_testnet.json')
 
 def set_regtest():
@@ -114,7 +114,7 @@ def set_regtest():
     HEADERS_URL = "" # "https://headers.electrum.org/testnet_headers"
     GENESIS = "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"
     SERVERLIST = 'servers_regtest.json'
-    DEFAULT_PORTS = {'t':'8003', 's':'8003'}
+    DEFAULT_PORTS = {'t':'8001', 's':'8002'}
     DEFAULT_SERVERS = read_json_dict('servers_regtest.json')
 
 ################################## transactions
@@ -123,7 +123,7 @@ FEE_STEP = 10000
 MAX_FEE_RATE = 300000
 FEE_TARGETS = [25, 10, 5, 2]
 
-COINBASE_MATURITY = 100
+COINBASE_MATURITY = 0
 COIN = 100000000
 
 # supported types of transction outputs
